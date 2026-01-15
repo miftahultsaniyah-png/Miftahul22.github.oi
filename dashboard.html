@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UMKM Produk</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    /* Reset & Base */
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #e0f2fe, #e9d5ff);
+      min-height: 100vh;
+      margin: 0;
+      color: #222;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-weight: 600;
+      font-size: 2.5rem;
+      color: #4c1d95; /* ungu gelap */
+      text-shadow: 0 2px 6px rgba(76,29,149,0.2);
+    }
+
+    .admin-button {
+      display: inline-block;
+      background: linear-gradient(90deg, #7e22ce, #a855f7);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 12px;
+      font-weight: 700;
+      text-decoration: none;
+      box-shadow: 0 4px 10px rgba(168,85,247,0.6);
+      transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+      margin: 0 auto 30px;
+      text-align: center;
+      cursor: pointer;
+    }
+    .admin-button:hover {
+      background: linear-gradient(90deg, #a855f7, #7e22ce);
+      box-shadow: 0 6px 18px rgba(168,85,247,0.8);
+      transform: scale(1.05);
+    }
+
+    .product-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      justify-content: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 14px;
+      width: 260px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      cursor: pointer;
+      transform: translateY(20px);
+      opacity: 0;
+      animation: fadeSlideUp 0.6s forwards;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
+      will-change: transform;
+    }
+    /* stagger animation delay */
+    .product-card:nth-child(1) { animation-delay: 0.05s; }
+    .product-card:nth-child(2) { animation-delay: 0.15s; }
+    .product-card:nth-child(3) { animation-delay: 0.25s; }
+    .product-card:nth-child(4) { animation-delay: 0.35s; }
+    .product-card:nth-child(5) { animation-delay: 0.45s; }
+    .product-card:nth-child(6) { animation-delay: 0.55s; }
+    .product-card:nth-child(7) { animation-delay: 0.65s; }
+    .product-card:nth-child(8) { animation-delay: 0.75s; }
+    .product-card:nth-child(9) { animation-delay: 0.85s; }
+    .product-card:nth-child(10) { animation-delay: 0.95s; }
+
+    .product-card:hover {
+      box-shadow: 0 16px 28px rgba(0,0,0,0.18);
+      transform: translateY(-10px) scale(1.03);
+    }
+
+    .product-card img {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      transition: transform 0.4s ease;
+    }
+
+    .product-card:hover img {
+      transform: scale(1.1);
+    }
+
+    .product-info {
+      padding: 18px 20px;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      text-align: center;
+    }
+
+    .product-info h3 {
+      margin: 0 0 10px 0;
+      color: #3b0764;
+      font-weight: 700;
+      font-size: 1.25rem;
+      letter-spacing: 0.03em;
+    }
+
+    .price {
+      font-weight: 700;
+      color: #059669; /* hijau cerah */
+      font-size: 1.2rem;
+      margin-bottom: 15px;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 3px rgba(5,150,105,0.3);
+    }
+
+    .btn-detail {
+      background: linear-gradient(90deg, #7e22ce, #a855f7);
+      color: white;
+      padding: 12px 0;
+      border: none;
+      border-radius: 0 0 14px 14px;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(168,85,247,0.6);
+      transition: background 0.4s ease, box-shadow 0.4s ease, transform 0.3s ease;
+    }
+
+    .btn-detail:hover {
+      background: linear-gradient(90deg, #a855f7, #7e22ce);
+      box-shadow: 0 6px 18px rgba(168,85,247,0.8);
+      transform: scale(1.05);
+    }
+
+    /* Animasi fade slide up */
+    @keyframes fadeSlideUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 600px) {
+      .product-card {
+        width: 100%;
+        max-width: 320px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Daftar Produk UMKM</h1>
+
+  <div style="text-align:center;">
+    <a href="admin.html" class="admin-button" aria-label="Menuju halaman admin">Admin</a>
+  </div>
+
+  <div class="product-list" id="productList"></div>
+
+  <script>
+    const defaultProducts = [
+      {id:1, name:"Keripik Singkong", price:15000, image:"singkong.jpg"},
+      {id:2, name:"Kue Lapis", price:20000, image:"lapis.jpg"},
+      {id:3, name:"Sambal Terasi", price:12000, image:"sambel terasi.jpg"},
+      {id:4, name:"Kerupuk Udang", price:25000, image:"kerupuk udang.jpg"},
+      {id:5, name:"Batagor", price:10000, image:"batagor.jpg"},
+      {id:6, name:"Rendang Daging", price:35000, image:"rendang.jpg"},
+      {id:7, name:"Pempek", price:15000, image:"pempek.jpg"},
+      {id:8, name:"Tahu Isi", price:8000, image:"tahu.jpg"},
+      {id:9, name:"Es Cendol", price:12000, image:"es.jpg"},
+      {id:10, name:"Kacang Rebus", price:10000, image:"kacang.jpg"},
+    ];
+
+    function getProducts() {
+      const data = localStorage.getItem('umkmProducts');
+      if (data) {
+        try {
+          return JSON.parse(data);
+        } catch {
+          return defaultProducts;
+        }
+      }
+      return defaultProducts;
+    }
+
+    const products = getProducts();
+
+    function formatRupiah(angka) {
+      return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    const productList = document.getElementById('productList');
+    productList.innerHTML = '';
+
+    products.forEach(product => {
+      const card = document.createElement('div');
+      card.className = 'product-card';
+
+      card.innerHTML = `
+        <img src="${product.image}" alt="${product.name}" loading="lazy" />
+        <div class="product-info">
+          <h3>${product.name}</h3>
+          <p class="price">${formatRupiah(product.price)}</p>
+        </div>
+        <a href="detail.html?id=${product.id}" class="btn-detail" aria-label="Lihat detail produk ${product.name}"></a>
+      `;
+
+      productList.appendChild(card);
+    });
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin UMKM Produk</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+    body {
+      font-family: 'Poppins', Arial, sans-serif;
+      padding: 20px;
+      background: linear-gradient(135deg, #f3e8ff, #e0e7ff);
+      min-height: 100vh;
+      margin: 0;
+      color: #333;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      font-weight: 600;
+      font-size: 2.5rem;
+      color: #5b21b6;
+    }
+
+    form {
+      max-width: 400px;
+      margin: 0 auto 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #4b088a;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    input[type="file"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 18px;
+      border: 1.8px solid #c4b5fd;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus,
+    input[type="number"]:focus,
+    input[type="file"]:focus {
+      border-color: #7c3aed;
+      outline: none;
+    }
+
+    button {
+      background: linear-gradient(90deg, #7e22ce, #a855f7);
+      color: white;
+      font-weight: 700;
+      padding: 12px;
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(168,85,247,0.6);
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: linear-gradient(90deg, #a855f7, #7e22ce);
+    }
+
+    .product-table {
+      max-width: 900px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      width: 100%;
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+
+    .product-table th,
+    .product-table td {
+      padding: 12px 15px;
+      text-align: center;
+      border-bottom: 1px solid #ddd;
+      vertical-align: middle;
+    }
+
+    .product-table th {
+      background-color: #7e22ce;
+      color: white;
+      font-weight: 700;
+    }
+
+    .product-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .product-table img {
+      width: 80px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    .btn-delete {
+      background-color: #dc2626;
+      border: none;
+      color: white;
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-delete:hover {
+      background-color: #b91c1c;
+    }
+
+    .message {
+      max-width: 400px;
+      margin: 0 auto 20px;
+      padding: 12px 20px;
+      background-color: #d1fae5;
+      color: #065f46;
+      border-radius: 10px;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+    }
+
+    #previewImage {
+      max-width: 100%;
+      margin-top: 10px;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin UMKM Produk</h1>
+
+  <div class="message" id="message"></div>
+
+  <form id="productForm">
+    <label for="name">Nama Produk</label>
+    <input type="text" id="name" name="name" placeholder="Masukkan nama produk" required />
+
+    <label for="price">Harga (Rp)</label>
+    <input type="number" id="price" name="price" placeholder="Masukkan harga produk" min="0" required />
+
+    <label for="imageFile">Pilih Gambar dari Laptop</label>
+    <input type="file" id="imageFile" accept="image/*" required />
+    <img id="previewImage" alt="Preview Gambar" />
+
+    <button type="submit">Tambah Produk</button>
+  </form>
+
+  <table class="product-table" id="productTable" aria-label="Daftar produk">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Gambar</th>
+        <th>Nama Produk</th>
+        <th>Harga</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Produk akan muncul di sini -->
+    </tbody>
+  </table>
+
+  <script>
+    const productForm = document.getElementById('productForm');
+    const productTableBody = document.querySelector('#productTable tbody');
+    const messageBox = document.getElementById('message');
+    const imageFileInput = document.getElementById('imageFile');
+    const previewImage = document.getElementById('previewImage');
+
+    const initialProducts = [
+      {id:1, name:"Keripik Singkong", price:15000, image:"singkong.jpg"},
+      {id:2, name:"Kue Lapis", price:20000, image:"lapis.jpg"},
+      {id:3, name:"Sambal Terasi", price:12000, image:"sambel terasi.jpg"},
+      {id:4, name:"Kerupuk Udang", price:25000, image:"kerupuk udang.jpg"},
+      {id:5, name:"Batagor", price:10000, image:"batagor.jpg"},
+      {id:6, name:"Rendang Daging", price:35000, image:"rendang.jpg"},
+      {id:7, name:"Pempek", price:15000, image:"pempek.jpg"},
+      {id:8, name:"Tahu Isi", price:8000, image:"tahu.jpg"},
+      {id:9, name:"Es Cendol", price:12000, image:"es.jpg"},
+      {id:10, name:"Kacang Rebus", price:10000, image:"kacang.jpg"},
+    ];
+
+    function formatRupiah(angka) {
+      return 'Rp ' + angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Load produk dari localStorage atau data awal
+    function loadProducts() {
+      const data = localStorage.getItem('umkmProducts');
+      if (data) {
+        return JSON.parse(data);
+      }
+      return [...initialProducts];
+    }
+
+    // Simpan produk ke localStorage
+    function saveProducts(products) {
+      localStorage.setItem('umkmProducts', JSON.stringify(products));
+    }
+
+    // Render tabel produk
+    function renderTable() {
+      const products = loadProducts();
+      productTableBody.innerHTML = '';
+
+      if (products.length === 0) {
+        productTableBody.innerHTML = `<tr><td colspan="5">Belum ada produk.</td></tr>`;
+        return;
+      }
+
+      products.forEach(product => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+          <td>${product.id}</td>
+          <td><img src="${product.image}" alt="${product.name}" loading="lazy"></td>
+          <td>${product.name}</td>
+          <td>${formatRupiah(product.price)}</td>
+          <td><button class="btn-delete" data-id="${product.id}" aria-label="Hapus produk ${product.name}">Hapus</button></td>
+        `;
+
+        productTableBody.appendChild(tr);
+      });
+
+      // Event tombol hapus
+      const deleteButtons = document.querySelectorAll('.btn-delete');
+      deleteButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = parseInt(btn.getAttribute('data-id'));
+          deleteProduct(id);
+        });
+      });
+    }
+
+    // Hapus produk berdasarkan ID
+    function deleteProduct(id) {
+      let products = loadProducts();
+      products = products.filter(p => p.id !== id);
+      saveProducts(products);
+      renderTable();
+      showMessage('Produk berhasil dihapus.');
+    }
+
+    // Variabel untuk simpan gambar base64 sementara
+    let selectedImageBase64 = '';
+
+    // Preview gambar ketika pilih file
+    imageFileInput.addEventListener('change', e => {
+      const file = e.target.files[0];
+      if (!file) {
+        previewImage.style.display = 'none';
+        selectedImageBase64 = '';
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(event) {
+        selectedImageBase64 = event.target.result;
+        previewImage.src = selectedImageBase64;
+        previewImage.style.display = 'block';
+      }
+      reader.readAsDataURL(file);
+    });
+
+    // Tambah produk baru
+    function addProduct(name, price, imageBase64) {
+      let products = loadProducts();
+      const maxId = products.length > 0 ? Math.max(...products.map(p => p.id)) : 0;
+      const newProduct = {
+        id: maxId + 1,
+        name,
+        price: Number(price),
+        image: imageBase64
+      };
+      products.push(newProduct);
+      saveProducts(products);
+      renderTable();
+      showMessage('Produk berhasil ditambahkan.');
+    }
+
+    // Tampilkan pesan singkat
+    function showMessage(text) {
+      messageBox.textContent = text;
+      messageBox.style.display = 'block';
+      setTimeout(() => {
+        messageBox.style.display = 'none';
+      }, 3000);
+    }
+
+    // Event submit form
+    productForm.addEventListener('submit', e => {
+      e.preventDefault();
+
+      const name = productForm.name.value.trim();
+      const price = productForm.price.value.trim();
+
+      if (!name || !price || !selectedImageBase64) {
+        alert('Semua field harus diisi dan gambar harus dipilih!');
+        return;
+      }
+
+      addProduct(name, price, selectedImageBase64);
+
+      // Reset form
+      productForm.reset();
+      previewImage.style.display = 'none';
+      selectedImageBase64 = '';
+    });
+
+    // Render awal
+    renderTable();
+  </script>
+
+</body>
+</html>
